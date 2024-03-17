@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <header>
+        <img class="logo-motus" src="./img/motus.jpg" alt="logo" />
+    </header>
+    <div class="form">
+        <div class="tab-group">
+            <a href="/signup">Inscription</a>
+        </div>
+        <div class="tab-content">
+            <div id="login">
+                <h1>Bienvenu!</h1>
+                    <div class="field-wrap">
+                        <label>
+                            Adresse mail<span class="req">*</span>
+                        </label>
+                        <input type="email" name="email" class="input-email" required autocomplete="off" value="<%- email ? email : null %>"/>
+                    </div>
+                    <div class="field-wrap">
+                        <label>
+                            Mot de passe<span class="req">*</span>
+                        </label>
+                        <input type="password" name="password" class="input-password" required autocomplete="off" />
+                    </div>
+                    <p class="forgot"><a href="#">Mot de passe oublié?</a></p>
+                    <button class="button-submit login button-block" />Connexion</button>
+            </div>
+        </div>
+    </div>
+    <div class="message-container">
+        <% if (message) { %>
+            <div class="message-content">
+                <p>
+                    <%= message %>
+                </p>
+            </div>
+            <% } %>
+    </div>
+    <script src="./js/script.js" type="module"></script>
+</body>
+
+</html>

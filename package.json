@@ -1,0 +1,20 @@
+{
+  "name": "motus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "motus.js",
+  "scripts": {
+    "start": "node ./server.js",
+    "create": "node ./utils/create_table.js",
+    "populate": "node ./utils/populate_table.js",
+    "drop": "node ./utils/drop_table.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "ejs": "^3.1.9",
+    "express": "^4.18.3",
+    "sqlite3": "^5.1.7"
+  }
+}

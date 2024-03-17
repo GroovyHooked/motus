@@ -1,0 +1,54 @@
+<%- include('generic/head') %>
+<body>
+    <%- include('generic/header') %>
+
+    <div class="form">
+        <div class="tab-group">
+            <a href="/login">Connexion</a>
+        </div>
+        <div class="tab-content">
+            <div id="signup">
+                <h1>Inscription</h1>
+                    <div class="top-row">
+                        <div class="field-wrap">
+                            <label>
+                                Prénom<span class="req">*</span>
+                            </label>
+                            <input type="text" name="firstname" class="input-firstname" required autocomplete="off" />
+                        </div>
+                        <div class="field-wrap">
+                            <label>
+                                Nom de famille<span class="req">*</span>
+                            </label>
+                            <input type="text" name="lastname" class="input-lastname" required autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="field-wrap">
+                        <label>
+                            Adresse mail<span class="req">*</span>
+                        </label>
+                        <input type="email" name="email" class="input-email" required autocomplete="off" />
+                    </div>
+                    <div class="field-wrap">
+                        <label>
+                            Mot de passe<span class="req">*</span>
+                        </label>
+                        <input type="password" name="password" class="input-password" required autocomplete="off" />
+                    </div>
+                    <button type="submit" class="button-submit signup button-block" />Valider</button>
+            </div>
+        </div>
+    </div>
+    <div class="message-container">
+        <% if (message) { %>
+            <div class="message-content">
+                <p>
+                    <%= message %>
+                </p>
+            </div>
+            <% } %>
+    </div>
+    <script src="./js/script.js" type="module"></script>
+</body>
+
+</html>

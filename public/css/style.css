@@ -1,0 +1,61 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+body {
+    background: #407EFB;
+    font-family: 'Titillium Web', sans-serif;
+    color: white;
+}
+
+header {
+    display: flex;
+    justify-content: center;
+
+    .logo-motus {
+        width: 260px;
+    }
+}
+
+
+a {
+    text-decoration: none;
+    color: white;
+    transition: .5s ease;
+
+    &:hover {
+        color: #FE231B;
+    }
+}
+
+.form {
+    padding: 40px;
+    max-width: 300px;
+    margin: 40px auto;
+    border-radius: 4px;
+    text-align: center;
+
+    button {
+        all: unset;
+    }
+    
+    label {
+        text-align: left;
+        margin-bottom: 4px;
+    }
+}
+
+
+.field-wrap {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    position: relative;
+    margin-bottom: 20px;
+}

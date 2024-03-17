@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/motus.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Document</title>
+</head>
+
+<body>
+    <%- include('generic/header') %>
+
+        <div class="motus-container">
+            <div class="motus-scores">
+                <div class="max-score">
+                    <p>Record: <span class="max-score-value">0</span></p>
+                </div>
+                <div class="current-score">
+                    <p>Trouvé(s): <span class="current-score-value">0</span></p>
+                </div>
+                <div class="timer">
+                    <p>Temps: <span class="timer-value">0</span></p>
+                </div>
+            </div>
+            <div class="motus-grid">
+                <!-- // générer une grille de word.length de largeur * 7 de hauteur -->
+                <% if(word !== undefined) { %>
+                    <%= console.log(word) %>
+                    <% for (let i=0; i < 7; i++) { %>
+                        <div class="motus-row motus-row-<%= i + 1 %>">
+                            <% for (let y=0; y < word.length; y++) { %>
+                                <div class="motus-col motus-col-<%= i + 1 %>">
+                                </div>
+                                <% } %>
+                        </div>
+                        <% } %>
+                    <% } %>
+
+            </div>
+            <div class="result-container">
+
+            </div>
+            <button class="submit">Rejouer</button>
+        </div>
+        <script>
+            let randomWord = "<%= word %>";
+            const motus_grid = document.querySelector('.motus-grid');
+            motus_grid.style.width = `${randomWord.length * 40}px`;
+        </script>
+        <script src="./js/motus.js" type="module"></script>
+</body>
+
+</html>
