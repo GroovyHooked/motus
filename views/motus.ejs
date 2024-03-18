@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/motus.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <title>Document</title>
-</head>
-
+<%- include('generic/head') %>
 <body>
     <%- include('generic/header') %>
 
@@ -18,20 +8,16 @@
                     <p>Record: <span class="max-score-value">0</span></p>
                 </div>
                 <div class="current-score">
-                    <p>Trouvé(s): <span class="current-score-value">0</span></p>
-                </div>
-                <div class="timer">
-                    <p>Temps: <span class="timer-value">0</span></p>
+                    <p>Trouvés: <span class="current-score-value">0</span></p>
                 </div>
             </div>
             <div class="motus-grid">
                 
             </div>
-            <div class="result-container">
+            <div class="message-container">
 
             </div>
             <button class="play-button">Commencer</button>
-            <button class="replay-button">Rejouer</button>
         </div>
         <script src="./js/motus.js" type="module"></script>
 </body>
