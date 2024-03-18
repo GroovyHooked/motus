@@ -74,7 +74,7 @@ function handleUserInput(event, randomWord) {
                     letters.push(element.innerHTML.toLowerCase());
                 }
             });
-            // If the word is not complete, return
+            // If there isn't a letter in each box, return
             if (letters.length < randomWord.length) {
                 resultContainer.innerHTML = 'The word is incomplete';
                 setTimeout(() => {
@@ -107,15 +107,15 @@ function handleUserInput(event, randomWord) {
                     delayInSeconds--;
                     resultContainer.innerHTML = `The word is complete, next word in ${delayInSeconds} seconds`;
                 }, 1000);
-                //resultContainer.innerHTML = `The word is complete, next word in ${delayInSeconds} seconds`;
                 setTimeout(() => {
                     resultContainer.innerHTML = '';
                     clearInterval(interval);
                     gameInit('medium');
+                    delayInSeconds = 3;
                 }, delayInMilliseconds);
                 return
             }
-
+            // If the word is not complete and the user can still play, display the known letters in the next row
             if (indexOfRowToFill !== 6) {
                 indexOfRowToFill++
                 rows[indexOfRowToFill].forEach((element, index) => {
@@ -134,7 +134,6 @@ function handleUserInput(event, randomWord) {
                     resultContainer.innerHTML = '';
                 }, 3000);
                 return
-                // TODO: display a message to the user
             }
         } else if (event.key === "Backspace") {
             // If the user presses the backspace key, remove the last letter 
@@ -197,9 +196,7 @@ async function retreiveWordFromServer(level) {
             .catch((error) => {
                 console.error('Error:', error);
             });
-    }).catch((error) => {
-        console.error('Error:', error);
-    });
+    })
 }
 
 function displayGrid(word) {

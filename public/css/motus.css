@@ -5,6 +5,7 @@
 
 .motus-grid {
     margin: 0 auto;
+    width: 280px;
 }
 
 .motus-row, .motus-col{
