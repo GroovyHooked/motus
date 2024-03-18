@@ -1,24 +1,27 @@
 class MotusGame {
     constructor() {
-        this.resultContainer = document.querySelector('.result-container');
+        this.messageContainer = document.querySelector('.message-container');
+        this.resultContainer = document.querySelector('.current-score-value');
         this.motusGrid = document.querySelector('.motus-grid');
         this.playButton = document.querySelector('.play-button');
-        this.replayButton = document.querySelector('.replay-button');
         this.rows = [];
         this.wordIndexesToFill = [0];
         this.randomWord;
         this.indexOfLetterTyped = 1;
         this.indexOfRowToFill = 0;
         this.delayInSeconds = 3;
-        this.delayInMilliseconds = this.delayInSeconds * 1000; // Convert seconds to milliseconds
+        this.delayInMilliseconds = this.delayInSeconds * 1000; 
+        this.nbOfWordsFound = 0;
         this.playButton.addEventListener('click', () => {
+            this.nbOfWordsFound = 0;
+            this.resultContainer.innerHTML = this.nbOfWordsFound;
             this.gameInit('medium');
         });
         document.addEventListener('keydown', (e) => {
             e.preventDefault();
             this.handleUserInput(e, this.randomWord);
         });
-        this.displayGrid('motuser');
+        this.displayGrid('default');
     }
 
     gameInit(level) {
@@ -70,7 +73,7 @@ class MotusGame {
                 });
                 // If the word is not complete, return
                 if (letters.length < randomWord.length) {
-                    this.displayMessage('The word is incomplete');
+                    this.displayMessage('Les cases vides ne sont pas autorisées');
                     return;
                 }
 
@@ -93,13 +96,16 @@ class MotusGame {
                 });
                  // If every indexes are in the array, the word is complete
                 if (this.wordIndexesToFill.length === randomWord.length) {
+                    this.nbOfWordsFound++;
+                    this.resultContainer.innerHTML = this.nbOfWordsFound;
+                    console.log(this.delayInSeconds);
                     this.displayMessage(`The word is complete, next word in ${this.delayInSeconds} seconds`);
                     const interval = setInterval(() => {
                         this.delayInSeconds--;
                         this.displayMessage(`The word is complete, next word in ${this.delayInSeconds} seconds`);
                     }, 1000);
                     setTimeout(() => {
-                        this.resultContainer.innerHTML = '';
+                        this.messageContainer.innerHTML = '';
                         clearInterval(interval);
                         this.gameInit('medium');
                         this.delayInSeconds = 3;
@@ -153,9 +159,10 @@ class MotusGame {
     }
 
     displayMessage(message) {
-        this.resultContainer.innerHTML = message;
-        setTimeout(() => {
-            this.resultContainer.innerHTML = '';
+        this.messageContainer.innerHTML = message;
+        const timeout = setTimeout(() => {
+            this.messageContainer.innerHTML = '';
+            clearTimeout(timeout);
         }, 3000);
     }
 
