@@ -73,8 +73,7 @@ app.post('/signup', (req, res) => {
 
 // Game page
 app.get('/motus', async function (req, res) {
-  const word = await selectRandomWord('medium');
-  res.render(__dirname + '/views/motus', { word: word });
+  res.render(__dirname + '/views/motus');
 });
 
 app.post('/motus', async (req, res) => {
