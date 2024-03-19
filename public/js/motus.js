@@ -2,8 +2,10 @@ class MotusGame {
     constructor() {
         this.messageContainer = document.querySelector('.message-container');
         this.resultContainer = document.querySelector('.current-score-value');
+        this.bestScoreContainer = document.querySelector('.max-score-value');
         this.motusGrid = document.querySelector('.motus-grid');
         this.playButton = document.querySelector('.play-button');
+
         this.rows = [];
         this.wordIndexesToFill = [0];
         this.randomWord;
@@ -12,6 +14,8 @@ class MotusGame {
         this.delayInSeconds = 3;
         this.delayInMilliseconds = this.delayInSeconds * 1000; 
         this.nbOfWordsFound = 0;
+        this.userEmail = decodeURIComponent(window.location.search.split('=')[1]);
+
         this.playButton.addEventListener('click', () => {
             this.nbOfWordsFound = 0;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
@@ -25,8 +29,9 @@ class MotusGame {
     }
 
     gameInit(level) {
-        this.retreiveWordFromServer(level).then((word) => {
+        this.retreiveWordFromServer(level).then(({word, bestScore}) => {
             this.motusGrid.style.width = `${word.length * 40}px`;
+            this.bestScoreContainer.innerHTML = bestScore;
             this.randomWord = word;
             this.wordIndexesToFill = [0];
             this.indexOfLetterTyped = 1;
@@ -127,6 +132,9 @@ class MotusGame {
                     this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
                 } else {
                     this.displayMessage('You lose');
+                    this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((data) => {
+                        console.log(data);
+                    });
                     return;
                 }
             } else if (event.key === "Backspace") {
@@ -175,12 +183,13 @@ class MotusGame {
                 },
                 body: JSON.stringify({
                     level,
+                    email: this.userEmail,
                 }),
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    resolve(data.word);
+                    resolve({word: data.word, bestScore: data.bestScore});
                 } else {
                     document.querySelector('.message-container').innerHTML = data.message;
                 }
@@ -188,6 +197,30 @@ class MotusGame {
             .catch((error) => {
                 console.error('Error:', error);
             });
+        });
+    }
+
+    async sendUserScore(email, score) {
+        fetch('/score', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                score,
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Score updated');
+            } else {
+                console.log('An error occurred while updating the best score');
+            }
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
     }
 

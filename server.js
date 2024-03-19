@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const { selectRandomWord, insertUser, retrieveUser } = require('./utils/database.js')
+const { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore } = require('./utils/database.js')
 const { comparePassword, isPasswordValid } = require('./utils/password.js')
 
 const app = express()
@@ -77,11 +77,22 @@ app.get('/motus', async function (req, res) {
 });
 
 app.post('/motus', async (req, res) => {
-  const { level } = req.body;
+  const { level, email } = req.body;
   const word = await selectRandomWord(level);
-  res.json({ success: true, level: level, word: word});
+  const bestScore = await getUserBestScore(email);
+  res.json({ success: true, level: level, word: word, bestScore: bestScore});
 });
 
+app.post('/score', async (req, res) => {
+  const { email, score } = req.body;
+  const bestScore = await getUserBestScore(email);
+  if (score > bestScore) {
+    updateUserBestScore(email, score);
+    res.json({ success: true, bestScore: score});
+  } else {
+    res.json({ success: false, bestScore: bestScore});
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
