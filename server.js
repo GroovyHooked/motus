@@ -65,8 +65,8 @@ app.get('/signup', (req, res) => {
 });
 
 app.post('/signup', (req, res) => {
-  const { firstname, lastname, email, password } = req.body;
-  insertUser(firstname, lastname, email, password);
+  const { firstName, lastName, email, password } = req.body;
+  insertUser(firstName, lastName, email, password);
   return res.json({ success: true, message: email });
 });
 
