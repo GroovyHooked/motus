@@ -12,13 +12,15 @@ class MotusGame {
         this.indexOfLetterTyped = 1;
         this.indexOfRowToFill = 0;
         this.delayInSeconds = 3;
-        this.delayInMilliseconds = this.delayInSeconds * 1000; 
+        this.delayInMilliseconds = this.delayInSeconds * 1000;
         this.nbOfWordsFound = 0;
         this.userEmail = decodeURIComponent(window.location.search.split('=')[1]);
 
         this.playButton.addEventListener('click', () => {
             this.nbOfWordsFound = 0;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
+            this.playButton.setAttribute('disabled', 'true');
+            this.playButton.style.backgroundColor = '#D3D3D3';
             this.gameInit('medium');
         });
         document.addEventListener('keydown', (e) => {
@@ -29,7 +31,8 @@ class MotusGame {
     }
 
     gameInit(level) {
-        this.retreiveWordFromServer(level).then(({word, bestScore}) => {
+        this.retreiveWordFromServer(level).then(({ word, bestScore }) => {
+            bestScore === null ? bestScore = 0 : null;
             this.motusGrid.style.width = `${word.length * 40}px`;
             this.bestScoreContainer.innerHTML = bestScore;
             this.randomWord = word;
@@ -95,11 +98,12 @@ class MotusGame {
                         this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FB1200';
                         !this.wordIndexesToFill.includes(index) ? this.wordIndexesToFill.push(index) : null;
                     } else if (randomWordCopy.includes(letter)) {
-                        this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE900';
+                        this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE102';
+                        this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
                         randomWordCopy = randomWordCopy.replace(letter, '.');
                     }
                 });
-                 // If every indexes are in the array, the word is complete
+                // If every indexes are in the array, the word is complete
                 if (this.wordIndexesToFill.length === randomWord.length) {
                     this.nbOfWordsFound++;
                     this.resultContainer.innerHTML = this.nbOfWordsFound;
@@ -131,9 +135,13 @@ class MotusGame {
                     });
                     this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
                 } else {
+                    this.playButton.removeAttribute('disabled');
+                    this.playButton.style.backgroundColor = '#0B65C6';
                     this.displayMessage('You lose');
-                    this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((data) => {
-                        console.log(data);
+                    this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
+                        setTimeout(() => {
+                            this.displayMessage(message);
+                        }, 3000);
                     });
                     return;
                 }
@@ -186,42 +194,44 @@ class MotusGame {
                     email: this.userEmail,
                 }),
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    resolve({word: data.word, bestScore: data.bestScore});
-                } else {
-                    document.querySelector('.message-container').innerHTML = data.message;
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resolve({ word: data.word, bestScore: data.bestScore });
+                    } else {
+                        document.querySelector('.message-container').innerHTML = data.message;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
         });
     }
 
     async sendUserScore(email, score) {
-        fetch('/score', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                email,
-                score,
-            }),
+        return new Promise((resolve, reject) => {
+            fetch('/score', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    score,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resolve(`Best score updated: ${data.bestScore}`);
+                    } else {
+                        resolve(`Best score: ${data.bestScore}`);
+                    }
+                })
+                .catch((error) => {
+                    reject(error);
+                });
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                console.log('Score updated');
-            } else {
-                console.log('An error occurred while updating the best score');
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
     }
 
     displayGrid(word) {
@@ -234,7 +244,7 @@ class MotusGame {
 
             for (let y = 0; y < word.length; y++) {
                 let col = document.createElement('div');
-                col.className = `motus-col motus-col-${i+ 1}`;
+                col.className = `motus-col motus-col-${i + 1}`;
                 row.appendChild(col);
             }
             this.motusGrid.appendChild(row);
