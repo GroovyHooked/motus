@@ -76,6 +76,20 @@ function retrieveUser(email) {
     });
 }
 
-module.exports = { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore};
+function retreiveBestScores() {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT firstName, bestScore FROM users ORDER BY bestScore DESC LIMIT 10`;
+        db.all(sql, (err, rows) => {
+            if (err) {
+                console.error(err.message);
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+module.exports = { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore, retreiveBestScores};
 
 

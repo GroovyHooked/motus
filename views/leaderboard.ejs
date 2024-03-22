@@ -1,0 +1,27 @@
+<%- include('generic/head') %>
+<body>
+    <%- include('generic/header') %>
+    <div class="leaderboard-container">
+        <h1>Classement des meilleurs joueurs</h1>
+        <div class="leaderboard">
+            <div class="score">
+                <p>Ordre</p>
+                <p>Joueur</p>
+                <p>Record</p>
+            </div>
+            <% if (bestScores && bestScores.length > 0) { %>
+                <% bestScores.forEach((element, index) => { %>
+                    <% if (typeof element.bestScore === 'number') { %>
+                        <div class="score">
+                            <p><%= index + 1 %></p>
+                            <p><%= element.firstName %></p>
+                            <p><%= element.bestScore %></p>
+                        </div>
+                    <% } %>
+                <% }); %>
+            <% } else { %>
+                <p>No scores to display</p>
+            <% } %>
+        </div>
+    </div>
+</body>

@@ -13,7 +13,6 @@ const loginSubmitButton = document.querySelector('.button-submit.login');
 
 if (singupSubmitButton) {
     singupSubmitButton.addEventListener('click', () => {
-        console.log(firstName?.value, lastName?.value, email?.value, password?.value);
         if (!firstName?.value || !lastName?.value || !email?.value || !password?.value) {
             document.querySelector('.message-container').innerHTML = 'All fields are required';
             return;

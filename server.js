@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore } = require('./utils/database.js')
+const { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore, retreiveBestScores } = require('./utils/database.js')
 const { comparePassword, isPasswordValid } = require('./utils/password.js')
 
 const app = express()
@@ -92,6 +92,12 @@ app.post('/score', async (req, res) => {
   } else {
     res.json({ success: false, bestScore: bestScore});
   }
+});
+
+// Leaderboard page
+app.get('/leaderboard', async function (req, res) {
+  const bestScores = await retreiveBestScores();
+  res.render(__dirname + '/views/leaderboard', { bestScores: bestScores });
 });
 
 app.listen(port, () => {
