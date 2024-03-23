@@ -12,6 +12,11 @@
     justify-content: space-evenly;
 }
 
+.message-container {
+    position: absolute;
+    top: 20vh;
+}
+
 .motus-grid {
     margin: 14vh auto 0;
     width: 280px;
@@ -41,4 +46,20 @@
     border-radius: 4px;
     cursor: pointer;
     transition: .5s ease;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    background-color: #0D64C5;
+    display: flex;
+    justify-content: space-evenly;
+
+    a {
+        color: white;
+        text-decoration: underline
+    }
 }
