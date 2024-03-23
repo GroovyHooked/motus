@@ -16,7 +16,8 @@ async function getUserBestScore(email) {
                 console.error(err.message);
                 reject(err);
             } else {
-                resolve(rows[0].bestScore);
+                if(rows.length === 0) resolve(0);
+                resolve(rows[0]?.bestScore);
             }
         });
     });
@@ -90,6 +91,20 @@ function retreiveBestScores() {
     });
 }
 
-module.exports = { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore, retreiveBestScores};
+function retreiveUserName(email) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT firstName FROM users WHERE email = ?`;
+        db.all(sql, [email], (err, rows) => {
+            if (err) {
+                console.error(err.message);
+                reject(err);
+            } else {
+                resolve(rows[0].firstName);
+            }
+        });
+    });
+}
+
+module.exports = { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore, retreiveBestScores, retreiveUserName};
 
 
