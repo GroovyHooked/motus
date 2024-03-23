@@ -1,0 +1,8 @@
+<footer class="footer">
+    <p>Bonjour <%= userName %></p>
+    <% if(page === 'game') { %>
+        <a href="/leaderboard"><p>Wall Of Fame</p></a>
+    <% } else { %>
+        <a href="/motus"><p>Motus</p></a>
+    <% } %>
+</footer>
