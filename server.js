@@ -1,3 +1,5 @@
+require('dotenv').config()
+
 const express = require('express')
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -10,9 +12,10 @@ const app = express()
 const port = 3000
 
 const sess = {
-  secret: 'secret_key',
+  secret: process.env.SESSION_SECRET,
   cookie: {}
 }
+
 if(app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
