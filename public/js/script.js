@@ -11,39 +11,61 @@ const password = document.querySelector('.input-password');
 const singupSubmitButton = document.querySelector('.button-submit.signup');
 const loginSubmitButton = document.querySelector('.button-submit.login');
 
+const displayMessage = (message) => {
+    document.querySelector('.message-container').innerHTML = message;
+}
+
+const validateUserInput = (firstName, lastName, email, password) => {
+    if (!firstName || !lastName || !email || !password) {
+        displayMessage('Tous les champs sont obligatoires');
+        return false;
+    }
+    const isPasswordValid = passwordRegex.test(password);
+    const isEmailValid = emailRegex.test(email);
+    if (!isEmailValid) {
+        displayMessage('Adresse email invalide');
+        return false;
+    }
+    if (!isPasswordValid) {
+        displayMessage('Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre');
+        return false;
+    }
+    return true;
+}
+
+const validateLoginInput = (email, password) => {
+    if (!email || !password) {
+        displayMessage('Tous les champs sont obligatoires');
+        return false;
+    }
+    const isEmailValid = emailRegex.test(email);
+    if (!isEmailValid) {
+        displayMessage('Adresse email invalide');
+        return false;
+    }
+    return true;
+}
+
 if (singupSubmitButton) {
     singupSubmitButton.addEventListener('click', () => {
-        if (!firstName?.value || !lastName?.value || !email?.value || !password?.value) {
-            document.querySelector('.message-container').innerHTML = 'Tous les champs sont obligatoires';
-            return;
+        const { value: firstNameValue } = firstName;
+        const { value: lastNameValue } = lastName;
+        const { value: emailValue } = email;
+        const { value: passwordValue } = password;
+        if (validateUserInput(firstNameValue, lastNameValue, emailValue, passwordValue)) {
+            sendUserSignupData(firstNameValue, lastNameValue, emailValue, passwordValue);
         }
-        const isPasswordValid = passwordRegex.test(password.value);
-        const isEmailValid = emailRegex.test(email.value);
-        if (!isEmailValid) {
-            document.querySelector('.message-container').innerHTML = 'Adresse email invalide';
-            return;
-        }
-        if (!isPasswordValid) {
-            document.querySelector('.message-container').innerHTML = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
-            return;
-        }
-        sendUserSignupData(firstName.value, lastName.value, email.value, password.value);
     });
 }
 
 if (loginSubmitButton) {
     loginSubmitButton.addEventListener('click', () => {
         console.log(email?.value, password?.value);
-        if (!email?.value || !password?.value) {
-            document.querySelector('.message-container').innerHTML = 'Tous les champs sont obligatoires';
-            return;
+        const { value: emailValue } = email;
+        const { value: passwordValue } = password;
+        if(validateLoginInput(emailValue, passwordValue)) {
+            sendUserLoginData(emailValue, passwordValue);
         }
-        const isEmailValid = emailRegex.test(email.value);
-        if (!isEmailValid) {
-            document.querySelector('.message-container').innerHTML = 'Adresse email invalide';
-            return;
-        }
-        sendUserLoginData(email.value, password.value);
     });
 }
 
@@ -69,7 +91,7 @@ function sendUserSignupData(firstName, lastName, email, password) {
             window.location.href = '/login?data=' + encodeURIComponent(data.message);
         } else {
             // Show error message without reloading the page
-            document.querySelector('.message-container').innerHTML = data.message;
+            displayMessage(data.message);
         }
     })
     .catch((error) => {
@@ -95,7 +117,7 @@ function sendUserLoginData(email, password) {
             window.location.href = '/motus';
         } else {
             // Show error message without reloading the page
-            document.querySelector('.message-container').innerHTML = data.message;
+            displayMessage(data.message);
         }
     })
     .catch((error) => {

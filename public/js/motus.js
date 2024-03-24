@@ -1,12 +1,21 @@
 class MotusGame {
     constructor() {
+        this.initElements()
+        this.initVariables();
+        this.initEvents();
+        this.displayGrid('default');
+    }
+
+    async initElements() {
         this.messageContainer = document.querySelector('.message-container-game');
         this.resultContainer = document.querySelector('.current-score-value');
         this.bestScoreContainer = document.querySelector('.max-score-value');
         this.motusGrid = document.querySelector('.motus-grid');
         this.playButton = document.querySelector('.play-button');
         this.leaderBoardLink = document.querySelector('.leaderboard-link');
+    }
 
+    async initVariables() {
         this.rows = [];
         this.wordIndexesToFill = [0];
         this.randomWord;
@@ -15,25 +24,30 @@ class MotusGame {
         this.delayInSeconds = 3;
         this.delayInMilliseconds = this.delayInSeconds * 1000;
         this.nbOfWordsFound = 0;
-        this.retrieveUserEmail().then((email) => {
-            this.userEmail = email;
-        }).catch((error) => {
-            console.error(error);
-        });
         this.isGamePlaying = false;
+        try {
+            this.userEmail = await this.retrieveUserEmail();
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-        this.playButton.addEventListener('click', () => {
-            this.nbOfWordsFound = 0;
-            this.resultContainer.innerHTML = this.nbOfWordsFound;
-            this.playButton.setAttribute('disabled', 'true');
-            this.playButton.style.backgroundColor = 'rgb(135 163 255)';
-            this.gameInit('medium');
-        });
-        document.addEventListener('keydown', (e) => {
-            e.preventDefault();
-            this.handleUserInput(e, this.randomWord);
-        });
-        this.displayGrid('default');
+    initEvents() {
+        this.playButton.addEventListener('click', () => this.handlePlayButtonClick());
+        document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    handlePlayButtonClick() {
+        this.nbOfWordsFound = 0;
+        this.resultContainer.innerHTML = this.nbOfWordsFound;
+        this.playButton.setAttribute('disabled', 'true');
+        this.playButton.style.backgroundColor = 'rgb(135 163 255)';
+        this.gameInit('medium');
+    }
+
+    handleKeyDown(e) {
+        e.preventDefault();
+        this.handleUserInput(e, this.randomWord);
     }
 
     gameInit(level) {
