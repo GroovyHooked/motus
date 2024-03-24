@@ -24,7 +24,7 @@ class MotusGame {
             this.nbOfWordsFound = 0;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
             this.playButton.setAttribute('disabled', 'true');
-            this.playButton.style.backgroundColor = '#D3D3D3';
+            this.playButton.style.backgroundColor = 'rgb(135 163 255)';
             this.gameInit('medium');
         });
         document.addEventListener('keydown', (e) => {

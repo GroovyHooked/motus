@@ -62,4 +62,14 @@ footer {
         color: white;
         text-decoration: underline
     }
+
+    a:last-child {
+        align-self: center;
+    }
+
+    img {
+        width: 30px;
+        height: 30px;
+
+    }
 }

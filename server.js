@@ -128,6 +128,15 @@ app.post('/user-data', async (req, res) => {
   res.json({ success: true, email: email });
 });
 
+app.get('/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error(err);
+    }
+    res.redirect('/login');
+  });
+});
+
 // Leaderboard page
 app.get('/leaderboard', async function (req, res) {
   if(!req.session.user) {
