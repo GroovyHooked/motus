@@ -151,7 +151,7 @@ class MotusGame {
                     this.leaderBoardLink.classList.remove('disabled-link');
                     this.playButton.removeAttribute('disabled');
                     this.playButton.style.backgroundColor = '#0B65C6';
-                    this.displayMessage('Partie terminée.');
+                    this.displayMessage('Partie terminée');
                     this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
                         setTimeout(() => {
                             this.displayMessage(message);
@@ -258,9 +258,9 @@ class MotusGame {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        resolve(`Best score updated: ${data.bestScore}`);
+                        resolve(`Mise à jour du meilleur score: ${data.bestScore}`);
                     } else {
-                        resolve(`Best score: ${data.bestScore}`);
+                        resolve(`Meilleur score: ${data.bestScore}`);
                     }
                 })
                 .catch((error) => {

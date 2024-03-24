@@ -4,6 +4,8 @@
     justify-content: center;
     align-items: center;
     background: #407EFB;
+    max-width: 550px;
+    margin: 0 auto;
 }
 
 .motus-scores {
@@ -57,7 +59,13 @@ footer {
     color: white;
     background-color: #0D64C5;
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
+
+    .footer-container {
+        display: flex;
+        justify-content: space-evenly;
+        width: 550px;
+    }
 
     a {
         color: white;

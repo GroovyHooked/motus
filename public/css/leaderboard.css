@@ -6,13 +6,14 @@ h1 {
 }
 
 .leaderboard {
-    width: 100%;
+    min-width: 70%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px;
+    margin-bottom: 50px;
 }
 
 .score {
@@ -21,4 +22,5 @@ h1 {
     justify-content: space-around;
     width: 60%;
     margin-bottom: 10px;
+    background-color: #0D64C5;
 }
