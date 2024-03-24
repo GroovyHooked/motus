@@ -14,7 +14,11 @@ class MotusGame {
         this.delayInSeconds = 3;
         this.delayInMilliseconds = this.delayInSeconds * 1000;
         this.nbOfWordsFound = 0;
-        this.userEmail = decodeURIComponent(window.location.search.split('=')[1]);
+        this.retrieveUserEmail().then((email) => {
+            this.userEmail = email;
+        }).catch((error) => {
+            console.error(error);
+        });
 
         this.playButton.addEventListener('click', () => {
             this.nbOfWordsFound = 0;
@@ -138,6 +142,7 @@ class MotusGame {
                     this.playButton.removeAttribute('disabled');
                     this.playButton.style.backgroundColor = '#0B65C6';
                     this.displayMessage('You lose');
+                    console.log(this.userEmail, this.nbOfWordsFound);
                     this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
                         setTimeout(() => {
                             this.displayMessage(message);
@@ -200,6 +205,27 @@ class MotusGame {
                         resolve({ word: data.word, bestScore: data.bestScore });
                     } else {
                         document.querySelector('.message-container').innerHTML = data.message;
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    }
+
+    async retrieveUserEmail() {
+        return new Promise((resolve) => {
+            fetch('/user-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if(data.success) {
+                        console.log({mail: data.email});
+                        resolve(data.email);
                     }
                 })
                 .catch((error) => {

@@ -94,7 +94,7 @@ function sendUserLoginData(email, password) {
         if (data.success) {
             // Redirect to game page
             console.log('Redirecting to game page');
-            window.location.href = '/motus?data=' + encodeURIComponent(data.email);
+            window.location.href = '/motus';
         } else {
             // Show error message without reloading the page
             document.querySelector('.message-container').innerHTML = data.message;

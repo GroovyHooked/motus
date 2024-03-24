@@ -123,6 +123,11 @@ app.post('/score', async (req, res) => {
   }
 });
 
+app.post('/user-data', async (req, res) => {
+  const email = req.session.user?.email;
+  res.json({ success: true, email: email });
+});
+
 // Leaderboard page
 app.get('/leaderboard', async function (req, res) {
   if(!req.session.user) {
