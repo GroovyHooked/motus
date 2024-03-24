@@ -14,17 +14,17 @@ const loginSubmitButton = document.querySelector('.button-submit.login');
 if (singupSubmitButton) {
     singupSubmitButton.addEventListener('click', () => {
         if (!firstName?.value || !lastName?.value || !email?.value || !password?.value) {
-            document.querySelector('.message-container').innerHTML = 'All fields are required';
+            document.querySelector('.message-container').innerHTML = 'Tous les champs sont obligatoires';
             return;
         }
         const isPasswordValid = passwordRegex.test(password.value);
         const isEmailValid = emailRegex.test(email.value);
         if (!isEmailValid) {
-            document.querySelector('.message-container').innerHTML = 'Invalid email';
+            document.querySelector('.message-container').innerHTML = 'Adresse email invalide';
             return;
         }
         if (!isPasswordValid) {
-            document.querySelector('.message-container').innerHTML = 'Password must contain at least 8 characters, one uppercase letter, one lowercase letter and one number';
+            document.querySelector('.message-container').innerHTML = 'Le mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule et un chiffre';
             return;
         }
         sendUserSignupData(firstName.value, lastName.value, email.value, password.value);
@@ -35,12 +35,12 @@ if (loginSubmitButton) {
     loginSubmitButton.addEventListener('click', () => {
         console.log(email?.value, password?.value);
         if (!email?.value || !password?.value) {
-            document.querySelector('.message-container').innerHTML = 'All fields are required';
+            document.querySelector('.message-container').innerHTML = 'Tous les champs sont obligatoires';
             return;
         }
         const isEmailValid = emailRegex.test(email.value);
         if (!isEmailValid) {
-            document.querySelector('.message-container').innerHTML = 'Invalid email';
+            document.querySelector('.message-container').innerHTML = 'Adresse email invalide';
             return;
         }
         sendUserLoginData(email.value, password.value);
@@ -66,7 +66,6 @@ function sendUserSignupData(firstName, lastName, email, password) {
     .then(data => {
         if (data.success) {
             // Redirect to login page
-            console.log(data.message, '\nRedirecting to login page');
             window.location.href = '/login?data=' + encodeURIComponent(data.message);
         } else {
             // Show error message without reloading the page
@@ -93,7 +92,6 @@ function sendUserLoginData(email, password) {
     .then(data => {
         if (data.success) {
             // Redirect to game page
-            console.log('Redirecting to game page');
             window.location.href = '/motus';
         } else {
             // Show error message without reloading the page

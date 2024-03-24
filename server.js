@@ -5,8 +5,16 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 
-const { selectRandomWord, insertUser, retrieveUser, updateUserBestScore, getUserBestScore, retreiveBestScores, retreiveUserName } = require('./utils/database.js')
-const { comparePassword, isPasswordValid } = require('./utils/password.js')
+const {
+  selectRandomWord,
+  insertUser,
+  retrieveUser,
+  updateUserBestScore,
+  getUserBestScore,
+  retreiveBestScores,
+  retreiveUserName
+} = require('./utils/database.js')
+const { comparePassword } = require('./utils/password.js')
 
 const app = express()
 const port = 3000
@@ -16,7 +24,7 @@ const sess = {
   cookie: {}
 }
 
-if(app.get('env') === 'production') {
+if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
 }
@@ -61,21 +69,20 @@ app.post('/login', async function (req, res) {
         if (match) {
           console.log('Password is correct');
           req.session.user = { email: email };
-          //req.session.save((err) => console.error(err));
           return res.json({ success: true, email: email });
         } else {
-          return res.json({ success: false, message: 'Invalid password' });
+          return res.json({ success: false, message: 'Mot de passe incorrect' });
         }
       }).catch((error) => {
         console.error(error);
-        return res.json({ success: false, message: 'An error occurred while comparing passwords' });
+        return res.json({ success: false, message: 'Une erreur est survenue lors de la verification de validité du mot de passe.' });
       });
     } else {
-      return res.json({ success: false, message: 'Invalid email' });
+      return res.json({ success: false, message: 'Email non valide' });
     }
   }).catch((error) => {
     console.error(error);
-    return res.json({ success: false, message: 'An error occurred while retrieving user' });
+    return res.json({ success: false, message: 'Une erreur est survenue lors du chargement de l\'utilisateur.' });
   });
 });
 
@@ -86,14 +93,23 @@ app.get('/signup', (req, res) => {
 
 app.post('/signup', (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-  insertUser(firstName, lastName, email, password);
-  return res.json({ success: true, message: email });
+  retrieveUser(email).then((user) => {
+    if (user) {
+      return res.json({ success: false, message: 'Cette adresse mail est déjà utilisée' });
+    } else {
+      insertUser(firstName, lastName, email, password);
+      return res.json({ success: true, message: email });
+    }
+  }).catch((error) => {
+    console.error(error);
+    return res.json({ success: false, message: 'Une erreur est survenue pendant la verification de l\'adresse mail' });
+  });
 });
 
 
 // Game page
 app.get('/motus', async function (req, res) {
-  console.log({session: req.session.user});
+  console.log({ session: req.session.user });
   if (!req.session.user) {
     res.redirect('/login');
   } else {
@@ -111,10 +127,11 @@ app.post('/motus', async (req, res) => {
   res.json({ success: true, level: level, word: word, bestScore: bestScore });
 });
 
+// data endpoint
 app.post('/score', async (req, res) => {
   const { email, score } = req.body;
   const bestScore = await getUserBestScore(email);
-  console.log({email, score, bestScore});
+  console.log({ email, score, bestScore });
   if (score > bestScore) {
     updateUserBestScore(email, score);
     res.json({ success: true, bestScore: score });
@@ -123,9 +140,21 @@ app.post('/score', async (req, res) => {
   }
 });
 
+// data endpoint
 app.post('/user-data', async (req, res) => {
   const email = req.session.user?.email;
   res.json({ success: true, email: email });
+});
+
+// Leaderboard page
+app.get('/leaderboard', async function (req, res) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  const bestScores = await retreiveBestScores();
+  const userEmail = req.session.user.email;
+  const userName = await retreiveUserName(userEmail);
+  res.render(__dirname + '/views/leaderboard', { bestScores: bestScores, userName: userName, page: 'leaderboard' });
 });
 
 app.get('/logout', (req, res) => {
@@ -135,17 +164,6 @@ app.get('/logout', (req, res) => {
     }
     res.redirect('/login');
   });
-});
-
-// Leaderboard page
-app.get('/leaderboard', async function (req, res) {
-  if(!req.session.user) {
-    return res.redirect('/login');
-  }
-  const bestScores = await retreiveBestScores();
-  const userEmail = req.session.user.email;
-  const userName = await retreiveUserName(userEmail);
-  res.render(__dirname + '/views/leaderboard', { bestScores: bestScores, userName: userName, page: 'leaderboard' });
 });
 
 app.listen(port, () => {

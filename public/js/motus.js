@@ -1,10 +1,11 @@
 class MotusGame {
     constructor() {
-        this.messageContainer = document.querySelector('.message-container');
+        this.messageContainer = document.querySelector('.message-container-game');
         this.resultContainer = document.querySelector('.current-score-value');
         this.bestScoreContainer = document.querySelector('.max-score-value');
         this.motusGrid = document.querySelector('.motus-grid');
         this.playButton = document.querySelector('.play-button');
+        this.leaderBoardLink = document.querySelector('.leaderboard-link');
 
         this.rows = [];
         this.wordIndexesToFill = [0];
@@ -19,6 +20,7 @@ class MotusGame {
         }).catch((error) => {
             console.error(error);
         });
+        this.isGamePlaying = false;
 
         this.playButton.addEventListener('click', () => {
             this.nbOfWordsFound = 0;
@@ -68,11 +70,15 @@ class MotusGame {
             element.style.transform = 'rotate(90deg)';
             element.style.textAlign = 'center';
         });
+        this.isGamePlaying = true;
+        this.leaderBoardLink.classList.add('disabled-link');
     }
 
     handleUserInput(event, randomWord) {
         if (event.key === "Enter" || event.key === "Backspace" || event.key.match(/^[a-zA-Z]$/i)) {
             if (event.key === "Enter") {
+                // return if the game is not playing
+                if (!this.isGamePlaying) return;
                 if (this.indexOfRowToFill > 6) return;
                 // If the user presses the enter key, check if the word is complete
                 // and if it is, check if the word is correct
@@ -112,16 +118,17 @@ class MotusGame {
                     this.nbOfWordsFound++;
                     this.resultContainer.innerHTML = this.nbOfWordsFound;
                     console.log(this.delayInSeconds);
-                    this.displayMessage(`The word is complete, next word in ${this.delayInSeconds} seconds`);
+                    this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
                     const interval = setInterval(() => {
                         this.delayInSeconds--;
-                        this.displayMessage(`The word is complete, next word in ${this.delayInSeconds} seconds`);
+                        this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
                     }, 1000);
-                    setTimeout(() => {
+                    const timeout = setTimeout(() => {
                         this.messageContainer.innerHTML = '';
                         clearInterval(interval);
                         this.gameInit('medium');
                         this.delayInSeconds = 3;
+                        clearTimeout(timeout);
                     }, this.delayInMilliseconds);
                     return;
                 }
@@ -139,10 +146,12 @@ class MotusGame {
                     });
                     this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
                 } else {
+                    // If the user has reached the last row and the word is not complete, the user loses
+                    this.isGamePlaying = false;
+                    this.leaderBoardLink.classList.remove('disabled-link');
                     this.playButton.removeAttribute('disabled');
                     this.playButton.style.backgroundColor = '#0B65C6';
-                    this.displayMessage('You lose');
-                    console.log(this.userEmail, this.nbOfWordsFound);
+                    this.displayMessage('Partie terminée.');
                     this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
                         setTimeout(() => {
                             this.displayMessage(message);
