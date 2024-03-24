@@ -78,7 +78,7 @@ app.post('/login', async function (req, res) {
         return res.json({ success: false, message: 'Une erreur est survenue lors de la verification de validité du mot de passe.' });
       });
     } else {
-      return res.json({ success: false, message: 'Email non valide' });
+      return res.json({ success: false, message: 'L\'utilisteur n\'est pas inscrit' });
     }
   }).catch((error) => {
     console.error(error);
