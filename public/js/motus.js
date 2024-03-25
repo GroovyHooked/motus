@@ -323,7 +323,28 @@ class MotusGame {
             this.motusGrid.appendChild(row);
         }
     }
-}
-
-const motusGame = new MotusGame();
+    async spellCheck(word) {
+        return new Promise((resolve, reject) => {
+            fetch('/spell-check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    word,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                })
+                .catch((error) => {
+                    reject(error);
+                });
+        });
+    }
 

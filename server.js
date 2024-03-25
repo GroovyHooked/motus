@@ -160,6 +160,18 @@ app.post('/word', async (req, res) => {
   }
 })
 
+// data endpoint
+app.post('/spell-check', async (req, res) => {
+  const { word } = req.body;
+  const spellChecker = new SpellChecker('./utils/dico.txt');
+  if (spellChecker.checkSpelling(word)) {
+    res.json({ success: true });
+  } else {
+    res.json({ success: false });
+  }
+});
+
+
 // Leaderboard page
 app.get('/leaderboard', async function (req, res) {
   if (!req.session.user) {
