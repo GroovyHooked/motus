@@ -44,11 +44,21 @@ class MotusGame {
     }
 
     handlePlayButtonClick() {
-        this.nbOfWordsFound = 0;
-        this.resultContainer.innerHTML = this.nbOfWordsFound;
-        this.playButton.setAttribute('disabled', 'true');
-        this.playButton.style.backgroundColor = 'rgb(135 163 255)';
-        this.gameInit(this.level);
+        if(!this.isGamePlaying) {
+            this.nbOfWordsFound = 0;
+            this.resultContainer.innerHTML = this.nbOfWordsFound;
+            this.playButton.innerHTML = 'Stop';
+            this.gameInit(this.level);
+        } else {
+            this.isGamePlaying = false;
+            this.playButton.innerHTML = 'Jouer';
+            this.displayMessage('Partie terminée');
+            this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
+                setTimeout(() => {
+                    this.displayMessage(message);
+                }, 3000);
+            });
+        }
     }
 
     handleKeyDown(e) {
