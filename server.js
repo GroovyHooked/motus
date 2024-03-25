@@ -18,6 +18,7 @@ const { comparePassword } = require('./utils/password.js')
 const { getWord } = require('./utils/get_word.js')
 const { SpellChecker } = require('./utils/spell_check.js')
 
+
 const app = express()
 const port = 3000
 
@@ -62,7 +63,6 @@ app.get('/login', async function (req, res) {
 });
 
 app.post('/login', async function (req, res) {
-  debugger
   const { email, password } = req.body;
   console.log(email, password);
   retrieveUser(email).then((user) => {
@@ -123,10 +123,9 @@ app.get('/motus', async function (req, res) {
 });
 
 app.post('/motus', async (req, res) => {
-  const { level, email } = req.body;
-  const word = await selectRandomWord(level);
+  const { email } = req.body;
   const bestScore = await getUserBestScore(email);
-  res.json({ success: true, level: level, word: word, bestScore: bestScore });
+  res.json({ success: true, bestScore: bestScore });
 });
 
 // data endpoint

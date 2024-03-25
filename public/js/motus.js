@@ -1,11 +1,11 @@
 class MotusGame {
-    constructor() {
+    constructor(level) {
         this.initElements()
-        this.initVariables();
+        this.initVariables(level);
         this.initEvents();
         this.displayGrid('default');
     }
-
+    
     async initElements() {
         this.messageContainer = document.querySelector('.message-container-game');
         this.resultContainer = document.querySelector('.current-score-value');
@@ -15,7 +15,7 @@ class MotusGame {
         this.leaderBoardLink = document.querySelector('.leaderboard-link');
     }
 
-    async initVariables() {
+    async initVariables(level) {
         this.rows = [];
         this.wordIndexesToFill = [0];
         this.randomWord;
@@ -25,6 +25,7 @@ class MotusGame {
         this.delayInMilliseconds = this.delayInSeconds * 1000;
         this.nbOfWordsFound = 0;
         this.isGamePlaying = false;
+        this.level = level;
         try {
             this.userEmail = await this.retrieveUserEmail();
         } catch (error) {
@@ -32,7 +33,12 @@ class MotusGame {
         }
     }
 
+    setLevel(level) {
+        this.level = level;
+    }
+
     initEvents() {
+        console.log('init events');
         this.playButton.addEventListener('click', () => this.handlePlayButtonClick());
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
@@ -42,7 +48,7 @@ class MotusGame {
         this.resultContainer.innerHTML = this.nbOfWordsFound;
         this.playButton.setAttribute('disabled', 'true');
         this.playButton.style.backgroundColor = 'rgb(135 163 255)';
-        this.gameInit('medium');
+        this.gameInit(this.level);
     }
 
     handleKeyDown(e) {
@@ -51,14 +57,17 @@ class MotusGame {
     }
 
     gameInit(level) {
-        this.retreiveWordFromServer(level).then(({ word, bestScore }) => {
+        this.retreiveBestScoreFromServer().then(({ bestScore }) => {
             bestScore === null ? bestScore = 0 : null;
-            this.motusGrid.style.width = `${word.length * 40}px`;
             this.bestScoreContainer.innerHTML = bestScore;
-            this.randomWord = word;
             this.wordIndexesToFill = [0];
             this.indexOfLetterTyped = 1;
             this.indexOfRowToFill = 0;
+        });
+        this.retrieveWordFromApi(level).then((word) => {
+            word = this.removeAccents(word);
+            this.motusGrid.style.width = `${word?.length * 40}px`;
+            this.randomWord = word;
             this.displayGrid(word);
             this.launchGame(word);
         });
@@ -89,101 +98,21 @@ class MotusGame {
     }
 
     handleUserInput(event, randomWord) {
+        if (!this.isGamePlaying) return;
         if (event.key === "Enter" || event.key === "Backspace" || event.key.match(/^[a-zA-Z]$/i)) {
             if (event.key === "Enter") {
-                // return if the game is not playing
-                if (!this.isGamePlaying) return;
-                if (this.indexOfRowToFill > 6) return;
-                // If the user presses the enter key, check if the word is complete
-                // and if it is, check if the word is correct
-                let letters = [];
-                // Create an array of the letters typed by the user
-                this.rows[this.indexOfRowToFill].forEach((element) => {
-                    if (element.innerHTML !== '.') {
-                        letters.push(element.innerHTML.toLowerCase());
-                    }
-                });
-                // If the word is not complete, return
-                if (letters.length < randomWord.length) {
-                    this.displayMessage('Les cases vides ne sont pas autorisées');
-                    return;
-                }
-
-                let randomWordCopy = randomWord;
-                // Replace the letters that are known by a dot
-                letters.forEach((letter, index) => {
-                    if (this.wordIndexesToFill.includes(index)) {
-                        randomWordCopy = randomWordCopy.replace(letter, '.');
-                    }
-                });
-                // Compare the array of letters with the random word
-                letters.forEach((letter, index) => {
-                    if (letter === randomWord[index]) {
-                        this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FB1200';
-                        !this.wordIndexesToFill.includes(index) ? this.wordIndexesToFill.push(index) : null;
-                    } else if (randomWordCopy.includes(letter)) {
-                        this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE102';
-                        this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
-                        randomWordCopy = randomWordCopy.replace(letter, '.');
-                    }
-                });
-                // If every indexes are in the array, the word is complete
-                if (this.wordIndexesToFill.length === randomWord.length) {
-                    this.nbOfWordsFound++;
-                    this.resultContainer.innerHTML = this.nbOfWordsFound;
-                    console.log(this.delayInSeconds);
-                    this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
-                    const interval = setInterval(() => {
-                        this.delayInSeconds--;
-                        this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
-                    }, 1000);
-                    const timeout = setTimeout(() => {
-                        this.messageContainer.innerHTML = '';
-                        clearInterval(interval);
-                        this.gameInit('medium');
-                        this.delayInSeconds = 3;
-                        clearTimeout(timeout);
-                    }, this.delayInMilliseconds);
-                    return;
-                }
-                // If the word is not complete and the user can still play, display the known letters in the next row
-                if (this.indexOfRowToFill !== 6) {
-                    this.indexOfRowToFill++;
-                    this.rows[this.indexOfRowToFill].forEach((element, index) => {
-                        if (this.wordIndexesToFill.includes(index)) {
-                            element.innerHTML = randomWord[index].toUpperCase();
-                        } else {
-                            element.innerHTML = '.';
-                        }
-                        element.style.transform = 'rotate(90deg)';
-                        element.style.textAlign = 'center';
-                    });
-                    this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
-                } else {
-                    // If the user has reached the last row and the word is not complete, the user loses
-                    this.isGamePlaying = false;
-                    this.leaderBoardLink.classList.remove('disabled-link');
-                    this.playButton.removeAttribute('disabled');
-                    this.playButton.style.backgroundColor = '#0B65C6';
-                    this.displayMessage('Partie terminée');
-                    this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
-                        setTimeout(() => {
-                            this.displayMessage(message);
-                        }, 3000);
-                    });
-                    return;
-                }
+                this.handleEnterKey(randomWord);
             } else if (event.key === "Backspace") {
                 // If the user presses the backspace key, remove the last letter 
                 // and replace it with a dot unless there are no more letters to remove
                 if (this.indexOfLetterTyped === 0) return;
                 this.indexOfLetterTyped--;
-                this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].innerHTML = '.';
+                this.rows[this.indexOfRowToFill][this.indexOfLetterTyped] ? this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].innerHTML = '.' : null;
             } else if (event.key.match(/^[a-zA-Z]$/i)) {
                 // return if the word is already complete
-                if (this.indexOfLetterTyped >= randomWord.length) return;
+                if (this.indexOfLetterTyped >= randomWord?.length) return;
                 // If the user presses a letter key, display the letter in the grid
-                this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].innerHTML = event.key.toUpperCase();
+                this.rows[this.indexOfRowToFill][this.indexOfLetterTyped] ? this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].innerHTML = event.key.toUpperCase() : null;
                 this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].style.transform = 'rotate(90deg)';
                 this.rows[this.indexOfRowToFill][this.indexOfLetterTyped].style.textAlign = 'center';
                 if (this.indexOfLetterTyped <= randomWord.length - 1) this.indexOfLetterTyped++;
@@ -235,6 +164,7 @@ class MotusGame {
         });
     }
 
+    async retreiveBestScoreFromServer() {
         return new Promise((resolve) => {
             fetch('/motus', {
                 method: 'POST',
@@ -242,14 +172,13 @@ class MotusGame {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    level,
                     email: this.userEmail,
                 }),
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        resolve({ word: data.word, bestScore: data.bestScore });
+                        resolve({ bestScore: data.bestScore });
                     } else {
                         document.querySelector('.message-container').innerHTML = data.message;
                     }
@@ -270,8 +199,8 @@ class MotusGame {
             })
                 .then(response => response.json())
                 .then(data => {
-                    if(data.success) {
-                        console.log({mail: data.email});
+                    if (data.success) {
+                        console.log({ mail: data.email });
                         resolve(data.email);
                     }
                 })
@@ -315,7 +244,7 @@ class MotusGame {
             let row = document.createElement('div');
             row.className = `motus-row motus-row-${i + 1}`;
 
-            for (let y = 0; y < word.length; y++) {
+            for (let y = 0; y < word?.length; y++) {
                 let col = document.createElement('div');
                 col.className = `motus-col motus-col-${i + 1}`;
                 row.appendChild(col);
@@ -323,6 +252,105 @@ class MotusGame {
             this.motusGrid.appendChild(row);
         }
     }
+
+    removeAccents(word) {
+        return word.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    async handleEnterKey(randomWord) {
+        // return if the game is not playing
+        if (this.indexOfRowToFill > 6) return;
+        // If the user presses the enter key, check if the word is complete
+        // and if it is, check if the word is correct
+        let letters = [];
+        // Create an array of the letters typed by the user
+        this.rows[this.indexOfRowToFill].forEach((element) => {
+            if (element.innerHTML !== '.') {
+                letters.push(element.innerHTML.toLowerCase());
+            }
+        });
+        // If the word is not complete, return
+        if (letters.length < randomWord?.length) {
+            this.displayMessage('Les cases vides ne sont pas autorisées');
+            return;
+        }
+
+        let randomWordCopy = randomWord;
+        // Check if the word is correct
+        const word = letters.join('');
+        const isWordValid = await this.spellCheck(word);
+        console.log({ isWordValid });
+        if (!isWordValid) {
+            this.displayMessage('Le mot n\'est pas correct');
+            return;
+        }
+
+        // Replace the letters that are known by a dot
+        letters.forEach((letter, index) => {
+            if (this.wordIndexesToFill.includes(index)) {
+                randomWordCopy = randomWordCopy.replace(letter, '.');
+            }
+        });
+        // Compare the array of letters with the random word
+        letters.forEach((letter, index) => {
+            if (letter === randomWord[index]) {
+                this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FB1200';
+                !this.wordIndexesToFill.includes(index) ? this.wordIndexesToFill.push(index) : null;
+                randomWordCopy = randomWordCopy.replace(letter, '.');
+            } else if (randomWordCopy.includes(letter)) {
+                this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE102';
+                this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
+                randomWordCopy = randomWordCopy.replace(letter, '.');
+            }
+        });
+        // If every indexes are in the array, the word is complete
+        if (this.wordIndexesToFill.length === randomWord?.length) {
+            this.nbOfWordsFound++;
+            this.resultContainer.innerHTML = this.nbOfWordsFound;
+            console.log(this.delayInSeconds);
+            this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
+            const interval = setInterval(() => {
+                this.delayInSeconds--;
+                this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
+            }, 1000);
+            const timeout = setTimeout(() => {
+                this.messageContainer.innerHTML = '';
+                clearInterval(interval);
+                this.gameInit(this.level);
+                this.delayInSeconds = 3;
+                clearTimeout(timeout);
+            }, this.delayInMilliseconds);
+            return;
+        }
+        // If the word is not complete and the user can still play, display the known letters in the next row
+        if (this.indexOfRowToFill !== 6) {
+            this.indexOfRowToFill++;
+            this.rows[this.indexOfRowToFill].forEach((element, index) => {
+                if (this.wordIndexesToFill.includes(index)) {
+                    element.innerHTML = randomWord[index].toUpperCase();
+                } else {
+                    element.innerHTML = '.';
+                }
+                element.style.transform = 'rotate(90deg)';
+                element.style.textAlign = 'center';
+            });
+            this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
+        } else {
+            // If the user has reached the last row and the word is not complete, the user loses
+            this.isGamePlaying = false;
+            this.leaderBoardLink.classList.remove('disabled-link');
+            this.playButton.removeAttribute('disabled');
+            this.playButton.style.backgroundColor = '#0B65C6';
+            this.displayMessage(`Partie terminée. (Mot: ${randomWord})`);
+            this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
+                setTimeout(() => {
+                    this.displayMessage(message);
+                }, 3000);
+            });
+            return;
+        }
+    }
+
     async spellCheck(word) {
         return new Promise((resolve, reject) => {
             fetch('/spell-check', {
@@ -347,4 +375,20 @@ class MotusGame {
                 });
         });
     }
+
+}
+
+const levelInput = document.querySelector('.level-input-value');
+
+levelInput.value = 6;
+
+let level = 6;
+let motusGame = new MotusGame(level);
+
+
+levelInput.addEventListener('change', (e) => {
+    level = Number(e.target.value);
+    motusGame.setLevel(level);
+});
+
 

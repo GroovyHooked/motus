@@ -6,6 +6,9 @@
                 <div class="max-score">
                     <p>Record: <span class="max-score-value">0</span></p>
                 </div>
+                <div class="level">
+                    <p>Niveau: <input type="number" class="level-input-value" value=""></input></p>
+                </div>
                 <div class="current-score">
                     <p>Trouvés: <span class="current-score-value">0</span></p>
                 </div>
@@ -16,6 +19,7 @@
         </div>
         <%- include('generic/footer', { userName, page }) %>
         <script src="./js/motus.js" type="module"></script>
+        <script src="./js/get_word.js" type="module"></script>
 </body>
 
 </html>
