@@ -210,7 +210,31 @@ class MotusGame {
         }, 3000);
     }
 
-    async retreiveWordFromServer(level) {
+    async retrieveWordFromApi(level) {
+        return new Promise((resolve) => {
+            fetch('/word', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    level,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resolve(data.word);
+                    } else {
+                        document.querySelector('.message-container').innerHTML = 'Une erreur est survenue pendant la récupération du mot';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+        });
+    }
+
         return new Promise((resolve) => {
             fetch('/motus', {
                 method: 'POST',

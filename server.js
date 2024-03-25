@@ -15,6 +15,8 @@ const {
   retreiveUserName
 } = require('./utils/database.js')
 const { comparePassword } = require('./utils/password.js')
+const { getWord } = require('./utils/get_word.js')
+const { SpellChecker } = require('./utils/spell_check.js')
 
 const app = express()
 const port = 3000
@@ -145,6 +147,18 @@ app.post('/user-data', async (req, res) => {
   const email = req.session.user?.email;
   res.json({ success: true, email: email });
 });
+
+// data endpoint
+app.post('/word', async (req, res) => {
+  const level = req.body.level;
+  try {
+    const word = await getWord(level);
+    res.json({ success: true, word: word });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false });
+  }
+})
 
 // Leaderboard page
 app.get('/leaderboard', async function (req, res) {
