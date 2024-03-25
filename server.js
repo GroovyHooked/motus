@@ -6,7 +6,6 @@ const path = require('path');
 const session = require('express-session');
 
 const {
-  selectRandomWord,
   insertUser,
   retrieveUser,
   updateUserBestScore,
@@ -24,25 +23,21 @@ const port = 3000
 
 const sess = {
   secret: process.env.SESSION_SECRET,
-  cookie: {}
+  cookie: {
+    secure: app.get('env') === 'production'
+  }
 }
-
-if (app.get('env') === 'production') {
-  app.set('trust proxy', 1) // trust first proxy
-  sess.cookie.secure = true // serve secure cookies
-}
-
 app.use(session(sess));
+
+// Middleware
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({ extended: true }));
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // parse application/json
 app.use(bodyParser.json());
-
-// Middleware
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: true }));
 
 // Set ejs as the view engine
 app.set('view engine', 'ejs');
@@ -54,35 +49,28 @@ app.get('/', (req, res) => {
 
 // Login page
 app.get('/login', async function (req, res) {
-  const email = req.query.data;
-  if (email) {
-    return res.render(__dirname + '/views/login', { message: '', email: email });
-  }
-  res.render(__dirname + '/views/login', { message: '', email: '' });
+  const email = req.query.data || '';
+  res.render(__dirname + '/views/login', { message: '', email: email });
 });
 
 app.post('/login', async function (req, res) {
   const { email, password } = req.body;
-  retrieveUser(email).then((user) => {
-    if (user) {
-      comparePassword(password, user.password).then((match) => {
-        if (match) {
-          req.session.user = { email: email };
-          return res.json({ success: true, email: email });
-        } else {
-          return res.json({ success: false, message: 'Mot de passe incorrect' });
-        }
-      }).catch((error) => {
-        console.error(error);
-        return res.json({ success: false, message: 'Une erreur est survenue lors de la verification de validité du mot de passe.' });
-      });
-    } else {
-      return res.json({ success: false, message: 'L\'utilisteur n\'est pas inscrit' });
+  try {
+    const user = await retrieveUser(email);
+    if (!user) {
+      return res.json({ success: false, message: 'L\'utilisateur n\'est pas inscrit' });
     }
-  }).catch((error) => {
+    const match = await comparePassword(password, user.password);
+    if (match) {
+      req.session.user = { email: email };
+      return res.json({ success: true, email: email });
+    } else {
+      return res.json({ success: false, message: 'Mot de passe incorrect' });
+    }
+  } catch (error) {
     console.error(error);
-    return res.json({ success: false, message: 'Une erreur est survenue lors du chargement de l\'utilisateur.' });
-  });
+    return res.json({ success: false, message: 'Une erreur est survenue lors de la vérification de validité du mot de passe.' });
+  }
 });
 
 // Signup page
@@ -90,33 +78,31 @@ app.get('/signup', (req, res) => {
   res.render(__dirname + '/views/signup', { message: '' });
 });
 
-app.post('/signup', (req, res) => {
+app.post('/signup', async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-  retrieveUser(email).then((user) => {
+  try {
+    const user = await retrieveUser(email);
     if (user) {
       return res.json({ success: false, message: 'Cette adresse mail est déjà utilisée' });
     } else {
       insertUser(firstName, lastName, email, password);
       return res.json({ success: true, message: email });
     }
-  }).catch((error) => {
+  } catch (error) {
     console.error(error);
-    return res.json({ success: false, message: 'Une erreur est survenue pendant la verification de l\'adresse mail' });
-  });
+    return res.json({ success: false, message: 'Une erreur est survenue pendant la vérification de l\'adresse mail' });
+  }
 });
 
 
 // Game page
 app.get('/motus', async function (req, res) {
-  ({ session: req.session.user });
-  if (!req.session.user) {
-    res.redirect('/login');
-  } else {
-    const userEmail = req.session.user?.email;
-    const userName = await retreiveUserName(userEmail);
-
-    res.render(__dirname + '/views/motus', { userName: userName, page: 'game' });
+  const userEmail = req.session.user?.email;
+  if (!userEmail) {
+    return res.redirect('/login');
   }
+  const userName = await retreiveUserName(userEmail);
+  res.render(__dirname + '/views/motus', { userName: userName, page: 'game' });
 });
 
 app.post('/motus', async (req, res) => {
@@ -169,11 +155,11 @@ app.post('/spell-check', async (req, res) => {
 
 // Leaderboard page
 app.get('/leaderboard', async function (req, res) {
-  if (!req.session.user) {
+  const userEmail = req.session.user?.email;
+  if (!userEmail) {
     return res.redirect('/login');
   }
   const bestScores = await retreiveBestScores();
-  const userEmail = req.session.user.email;
   const userName = await retreiveUserName(userEmail);
   res.render(__dirname + '/views/leaderboard', { bestScores: bestScores, userName: userName, page: 'leaderboard' });
 });
