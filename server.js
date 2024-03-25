@@ -34,7 +34,6 @@ if (app.get('env') === 'production') {
 
 app.use(session(sess));
 
-console.log(app.get('env'));
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -64,12 +63,10 @@ app.get('/login', async function (req, res) {
 
 app.post('/login', async function (req, res) {
   const { email, password } = req.body;
-  console.log(email, password);
   retrieveUser(email).then((user) => {
     if (user) {
       comparePassword(password, user.password).then((match) => {
         if (match) {
-          console.log('Password is correct');
           req.session.user = { email: email };
           return res.json({ success: true, email: email });
         } else {
@@ -111,7 +108,7 @@ app.post('/signup', (req, res) => {
 
 // Game page
 app.get('/motus', async function (req, res) {
-  console.log({ session: req.session.user });
+  ({ session: req.session.user });
   if (!req.session.user) {
     res.redirect('/login');
   } else {
@@ -132,7 +129,6 @@ app.post('/motus', async (req, res) => {
 app.post('/score', async (req, res) => {
   const { email, score } = req.body;
   const bestScore = await getUserBestScore(email);
-  console.log({ email, score, bestScore });
   if (score > bestScore) {
     updateUserBestScore(email, score);
     res.json({ success: true, bestScore: score });

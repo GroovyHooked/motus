@@ -60,7 +60,6 @@ if (singupSubmitButton) {
 
 if (loginSubmitButton) {
     loginSubmitButton.addEventListener('click', () => {
-        console.log(email?.value, password?.value);
         const { value: emailValue } = email;
         const { value: passwordValue } = password;
         if(validateLoginInput(emailValue, passwordValue)) {

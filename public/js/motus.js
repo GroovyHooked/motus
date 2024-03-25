@@ -6,6 +6,10 @@ class MotusGame {
         this.displayGrid('default');
     }
     
+    setLevel(level) {
+        this.level = level;
+    }
+    
     async initElements() {
         this.messageContainer = document.querySelector('.message-container-game');
         this.resultContainer = document.querySelector('.current-score-value');
@@ -33,12 +37,7 @@ class MotusGame {
         }
     }
 
-    setLevel(level) {
-        this.level = level;
-    }
-
     initEvents() {
-        console.log('init events');
         this.playButton.addEventListener('click', () => this.handlePlayButtonClick());
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
     }
@@ -210,7 +209,6 @@ class MotusGame {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        console.log({ mail: data.email });
                         resolve(data.email);
                     }
                 })
@@ -289,7 +287,6 @@ class MotusGame {
         // Check if the word is correct
         const word = letters.join('');
         const isWordValid = await this.spellCheck(word);
-        console.log({ isWordValid });
         if (!isWordValid) {
             this.displayMessage('Le mot n\'est pas correct');
             return;
@@ -317,7 +314,6 @@ class MotusGame {
         if (this.wordIndexesToFill.length === randomWord?.length) {
             this.nbOfWordsFound++;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
-            console.log(this.delayInSeconds);
             this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
             const interval = setInterval(() => {
                 this.delayInSeconds--;
