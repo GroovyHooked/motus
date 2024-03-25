@@ -1,7 +1,15 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 10 versions
+*/
+
 *,
 *:before,
 *:after {
-    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+            box-sizing: border-box;
 }
 
 html {
@@ -15,23 +23,28 @@ body {
 }
 
 header {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: center;
-
-    .logo-motus {
-        width: 260px;
-    }
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
 }
 
+.logo-motus {
+    width: 260px;
+}
 
 a {
     text-decoration: none;
     color: white;
+    -webkit-transition: .5s ease;
+    -o-transition: .5s ease;
     transition: .5s ease;
+}
 
-    &:hover {
-        color: #FE231B;
-    }
+a:hover {
+    color: #FE231B;
 }
 
 .form {
@@ -40,22 +53,45 @@ a {
     margin: 40px auto;
     border-radius: 4px;
     text-align: center;
+}
 
-    button {
-        all: unset;
-    }
-    
-    label {
-        text-align: left;
-        margin-bottom: 4px;
-    }
+.tab-group a{
+    color: white;
+    text-decoration: underline;
+    color: #042782;
 }
 
 
+button {
+    all: unset;
+}
+
+label {
+    text-align: left;
+    margin-bottom: 4px;
+}
+
+.button-submit {
+    background-color: #0B65C6;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    -webkit-transition: .5s ease;
+    -o-transition: .5s ease;
+    transition: .5s ease;
+}
+
 .field-wrap {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
     position: relative;
     margin-bottom: 20px;
 }

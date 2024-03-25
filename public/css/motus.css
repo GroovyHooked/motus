@@ -1,59 +1,85 @@
+/*
+* Prefixed by https://autoprefixer.github.io
+* PostCSS: v8.4.14,
+* Autoprefixer: v10.4.7
+* Browsers: last 10 versions
+*/
+
 .motus-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center;
     background: #407EFB;
     max-width: 550px;
     margin: 0 auto;
+}
 
-    .motus-scores {
-        display: flex;
-        width: 100%;
-        justify-content: space-evenly;
+.motus-scores {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    width: 100%;
+    -webkit-box-pack: space-evenly;
+        -ms-flex-pack: space-evenly;
+            justify-content: space-evenly;
 
-        .level-input-value {
-            width: 40px;
-        }
-    }
+}
 
-    .message-container-game {
-        position: absolute;
-        top: 20vh;
-        text-align: center;
-    }
+.level-input-value {
+    width: 40px;
+}
 
-    .motus-grid {
-        margin: 14vh auto 0;
-        width: 280px;
+.message-container-game {
+    position: absolute;
+    top: 20vh;
+    text-align: center;
+}
 
-        .motus-row,
-        .motus-col {
-            width: 40px;
-            height: 40px;
-            background-color: #0B65C6;
-        }
+.motus-grid {
+    margin: 14vh auto 0;
+    width: 280px;
 
-        .motus-col {
-            border: 1px solid #000;
-            line-height: 40px;
-        }
+}
 
-        .motus-row {
+.motus-row,
+.motus-col {
+    width: 40px;
+    height: 40px;
+    background-color: #0B65C6;
+}
+
+.motus-col {
+    border: 1px solid #000;
+    line-height: 40px;
+}
+
+.motus-row {
+    -webkit-transform: rotate(-90deg);
+        -ms-transform: rotate(-90deg);
             transform: rotate(-90deg);
-        }
-    }
+}
 
-    .play-button {
-        margin-top: 20px;
-        padding: 10px 20px;
-        background-color: #0B65C6;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: .5s ease;
-    }
+.play-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #0B65C6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    -webkit-transition: .5s ease;
+    -o-transition: .5s ease;
+    transition: .5s ease;
 }
 
 footer {
@@ -63,30 +89,40 @@ footer {
     width: 100%;
     color: white;
     background-color: #0D64C5;
+    display: -webkit-box;
+    display: -ms-flexbox;
     display: flex;
-    justify-content: center;
+    -webkit-box-pack: center;
+        -ms-flex-pack: center;
+            justify-content: center;
+}
 
-    .footer-container {
-        display: flex;
-        justify-content: space-evenly;
-        width: 550px;
-    }
+.footer-container {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: space-evenly;
+        -ms-flex-pack: space-evenly;
+            justify-content: space-evenly;
+    width: 550px;
+}
 
-    a {
-        color: white;
-        text-decoration: underline;
-        color: #042782;
-    }
+a {
+    color: white;
+    text-decoration: underline;
+    color: #042782;
+}
 
-    a:last-child {
+a:last-child {
+    -ms-flex-item-align: center;
+        -ms-grid-row-align: center;
         align-self: center;
-    }
+}
 
-    img {
-        width: 30px;
-        height: 30px;
+img.logout {
+    width: 30px;
+    height: 30px;
 
-    }
 }
 
 .disabled-link {
