@@ -391,6 +391,14 @@ class MotusGame {
 
 const levelInput = document.querySelector('.level-input-value');
 
+const motusGrid = document.querySelector('.motus-grid');
+
+if (/Mobi|Android/i.test(navigator.userAgent)) {
+    motusGrid.addEventListener('click', function() {
+        this.focus();
+    });
+}
+
 levelInput.value = 6;
 
 let level = 6;
