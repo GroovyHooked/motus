@@ -50,12 +50,16 @@ class MotusGame {
             this.gameInit(this.level);
         } else {
             this.isGamePlaying = false;
+            this.leaderBoardLink.classList.remove('disabled-link');
             this.playButton.innerHTML = 'Jouer';
             this.displayMessage('Partie terminée');
             this.sendUserScore(this.userEmail, this.nbOfWordsFound).then((message) => {
                 setTimeout(() => {
                     this.displayMessage(message);
                 }, 3000);
+            });
+            this.rows[this.indexOfRowToFill].forEach((element) => {
+                    if(element.innerHTML === '.') element.innerHTML = '';
             });
         }
     }
@@ -344,6 +348,7 @@ class MotusGame {
         } else {
             // If the user has reached the last row and the word is not complete, the user loses
             this.isGamePlaying = false;
+            this.playButton.innerHTML = 'Jouer';
             this.leaderBoardLink.classList.remove('disabled-link');
             this.playButton.removeAttribute('disabled');
             this.playButton.style.backgroundColor = '#0B65C6';
