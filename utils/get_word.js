@@ -5,7 +5,6 @@ async function getWord(size = 5) {
             fetch(`https://trouve-mot.fr/api/size/${size}`)
                 .then((response) => response.json())
                 .then((words) => {
-                    console.log({words});
                     resolve(words[0]?.name)
                 })
                 .catch((error) => reject(error));
