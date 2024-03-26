@@ -288,34 +288,38 @@ class MotusGame {
         }
 
         let randomWordCopy = randomWord;
+        const lettersCopy = letters;
+        const wordIndexesToFillCopy = [];
+
         // Check if the word is correct
         const word = letters.join('');
         const isWordValid = await this.spellCheck(word);
         if (!isWordValid) {
-            this.displayMessage('Le mot n\'est pas correct');
+            this.displayMessage('Le mot est mal orthographié');
             return;
         }
 
-        // Replace the letters that are known by a dot
-        letters.forEach((letter, index) => {
-            if (this.wordIndexesToFill.includes(index)) {
-                randomWordCopy = randomWordCopy.replace(letter, '.');
-            }
-        });
         // Compare the array of letters with the random word
         letters.forEach((letter, index) => {
-            if (letter === randomWord[index]) {
+            if (letter === randomWordCopy[index]) {
+                lettersCopy[index] = '.'
                 this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FB1200';
+                !wordIndexesToFillCopy.includes(index) ? wordIndexesToFillCopy.push(index) : null;
                 !this.wordIndexesToFill.includes(index) ? this.wordIndexesToFill.push(index) : null;
                 randomWordCopy = randomWordCopy.replace(letter, '.');
-            } else if (randomWordCopy.includes(letter)) {
+            } 
+        });
+
+        lettersCopy.forEach((letter, index) => {
+             if (/[a-zA-Z]/g.test(letter) && randomWordCopy.includes(letter)) {
                 this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE102';
                 this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
                 randomWordCopy = randomWordCopy.replace(letter, '.');
             }
         });
+
         // If every indexes are in the array, the word is complete
-        if (this.wordIndexesToFill.length === randomWord?.length) {
+        if (wordIndexesToFillCopy.length === randomWord?.length) {
             this.nbOfWordsFound++;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
             this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
