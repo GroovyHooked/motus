@@ -44,8 +44,7 @@ body {
 }
 
 .message-container-game {
-    position: absolute;
-    top: 17vh;
+    height: 10px;
 }
 
 .motus-grid {
@@ -73,7 +72,7 @@ body {
 }
 
 .play-button {
-    margin-top: 20px;
+    margin-top: 14px;
     padding: 10px 20px;
     background-color: #0B65C6;
     color: white;
