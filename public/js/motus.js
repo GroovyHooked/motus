@@ -6,11 +6,11 @@ class MotusGame {
         this.initKeyboard();
         this.displayGrid('default');
     }
-    
+
     setLevel(level) {
         this.level = level;
     }
-    
+
     async initElements() {
         this.messageContainer = document.querySelector('.message-container-game');
         this.resultContainer = document.querySelector('.current-score-value');
@@ -22,7 +22,8 @@ class MotusGame {
 
     async initVariables(level) {
         this.rows = [];
-        this.wordIndexesToFill = [0];
+        this.lettersTyped = [];
+        this.wordIndexesToFillOnGrid = [0];
         this.randomWord;
         this.indexOfLetterTyped = 1;
         this.indexOfRowToFill = 0;
@@ -50,20 +51,52 @@ class MotusGame {
             keys.forEach(key => {
                 key.addEventListener('click', () => {
                     const keyValue = key.getAttribute('data-key');
-                    this.handleUserInput({key: keyValue}, this.randomWord);
+                    this.handleUserInput({ key: keyValue }, this.randomWord);
                 });
             });
         });
     }
 
+    colorKeyboardLetter(letters) {
+        const keys = document.querySelectorAll('.key');
+        letters.forEach(element => {
+            if (element.status === 'correct') {
+                keys.forEach(key => {
+                    if (key.getAttribute('data-key').toLowerCase() === element.letter) {
+                        key.style.backgroundColor = '#FB1200';
+                    }
+                });
+            } else if (element.status === 'present') {
+                keys.forEach(key => {
+                    if (key.getAttribute('data-key').toLowerCase() === element.letter) {
+                        key.style.backgroundColor = '#fdc600';
+                    }
+                });
+            } else {
+                keys.forEach(key => {
+                    if (key.getAttribute('data-key').toLowerCase() === element.letter) {
+                        key.style.backgroundColor = '#0D64C5';
+                    }
+                });
+            }
+        })
+    }
+
+    clearKeyboard() {
+        const keys = document.querySelectorAll('.key');
+        keys.forEach(key => key.style.backgroundColor = '#407EFB');
+    }
+
     handlePlayButtonClick() {
-        if(!this.isGamePlaying) {
+        if (!this.isGamePlaying) {
             this.nbOfWordsFound = 0;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
             this.playButton.innerHTML = 'Stop';
             this.gameInit(this.level);
         } else {
             this.isGamePlaying = false;
+            this.lettersTyped = [];
+            this.clearKeyboard();
             this.leaderBoardLink.classList.remove('disabled-link');
             this.playButton.innerHTML = 'Jouer';
             this.displayMessage('Partie terminée');
@@ -73,7 +106,7 @@ class MotusGame {
                 }, 3000);
             });
             this.rows[this.indexOfRowToFill].forEach((element) => {
-                    if(element.innerHTML === '.') element.innerHTML = '';
+                if (element.innerHTML === '.') element.innerHTML = '';
             });
         }
     }
@@ -87,7 +120,7 @@ class MotusGame {
         this.retreiveBestScoreFromServer().then(({ bestScore }) => {
             bestScore === null ? bestScore = 0 : null;
             this.bestScoreContainer.innerHTML = bestScore;
-            this.wordIndexesToFill = [0];
+            this.wordIndexesToFillOnGrid = [0];
             this.indexOfLetterTyped = 1;
             this.indexOfRowToFill = 0;
         });
@@ -112,7 +145,7 @@ class MotusGame {
         this.rows.push(firstRow, secondRow, thirdRow, fourthRow, fifthRow, sixthRow, seventhRow);
 
         this.rows[0].forEach((element, index) => {
-            if (this.wordIndexesToFill.includes(index)) {
+            if (this.wordIndexesToFillOnGrid.includes(index)) {
                 element.innerHTML = randomWord[index].toUpperCase();
             } else {
                 element.innerHTML = '.';
@@ -288,52 +321,59 @@ class MotusGame {
         if (this.indexOfRowToFill > 6) return;
         // If the user presses the enter key, check if the word is complete
         // and if it is, check if the word is correct
-        let letters = [];
-        // Create an array of the letters typed by the user
+        const rowLetters = [];
+        // Create an array of the rowLetters typed by the user
         this.rows[this.indexOfRowToFill].forEach((element) => {
             if (element.innerHTML !== '.') {
-                letters.push(element.innerHTML.toLowerCase());
+                rowLetters.push(element.innerHTML.toLowerCase());
             }
         });
         // If the word is not complete, return
-        if (letters.length < randomWord?.length) {
+        if (rowLetters.length < randomWord?.length) {
             this.displayMessage('Les cases vides ne sont pas autorisées');
             return;
         }
 
         let randomWordCopy = randomWord;
-        const lettersCopy = letters;
-        const wordIndexesToFillCopy = [];
+        const lettersCopy = rowLetters;
+        const wordIndexesToFillOnGrid = [];
 
         // Check if the word is correct
-        const word = letters.join('');
+        const word = rowLetters.join('');
         const isWordValid = await this.spellCheck(word);
         if (!isWordValid) {
             this.displayMessage('Le mot est mal orthographié');
             return;
         }
 
-        // Compare the array of letters with the random word
-        letters.forEach((letter, index) => {
+        // Compare the array of rowLetters with the random word
+        rowLetters.forEach((letter, index) => {
+            this.lettersTyped.some(e => e.letter === letter) ? null : this.lettersTyped.push({ letter, status: null });
             if (letter === randomWordCopy[index]) {
                 lettersCopy[index] = '.'
                 this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FB1200';
-                !wordIndexesToFillCopy.includes(index) ? wordIndexesToFillCopy.push(index) : null;
-                !this.wordIndexesToFill.includes(index) ? this.wordIndexesToFill.push(index) : null;
-                randomWordCopy = randomWordCopy.replace(letter, '.');
-            } 
-        });
-
-        lettersCopy.forEach((letter, index) => {
-             if (/[a-zA-Z]/g.test(letter) && randomWordCopy.includes(letter)) {
-                this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#FEE102';
-                this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
+                this.lettersTyped.some(e => e.letter === letter) ? this.lettersTyped.find(e => e.letter === letter).status = 'correct' : null;
+                !wordIndexesToFillOnGrid.includes(index) ? wordIndexesToFillOnGrid.push(index) : null;
+                !this.wordIndexesToFillOnGrid.includes(index) ? this.wordIndexesToFillOnGrid.push(index) : null;
                 randomWordCopy = randomWordCopy.replace(letter, '.');
             }
         });
 
+        lettersCopy.forEach((letter, index) => {
+            if (/[a-zA-Z]/g.test(letter) && randomWordCopy.includes(letter)) {
+                this.lettersTyped.some(e => e.letter === letter && e.status !== 'correct') ? this.lettersTyped.find(e => e.letter === letter).status = 'present' : null;
+                this.rows[this.indexOfRowToFill][index].style.backgroundColor = '#fdc600';
+                this.rows[this.indexOfRowToFill][index].style.borderRadius = '50%';
+                randomWordCopy = randomWordCopy.replace(letter, '.');
+            }
+        });
+      
+        this.colorKeyboardLetter(this.lettersTyped);
+
         // If every indexes are in the array, the word is complete
-        if (wordIndexesToFillCopy.length === randomWord?.length) {
+        if (wordIndexesToFillOnGrid.length === randomWord?.length) {
+            this.clearKeyboard();
+            this.lettersTyped = [];
             this.nbOfWordsFound++;
             this.resultContainer.innerHTML = this.nbOfWordsFound;
             this.displayMessage(`Bravo! Prochain mot dans ${this.delayInSeconds} secondes`);
@@ -354,7 +394,7 @@ class MotusGame {
         if (this.indexOfRowToFill !== 6) {
             this.indexOfRowToFill++;
             this.rows[this.indexOfRowToFill].forEach((element, index) => {
-                if (this.wordIndexesToFill.includes(index)) {
+                if (this.wordIndexesToFillOnGrid.includes(index)) {
                     element.innerHTML = randomWord[index].toUpperCase();
                 } else {
                     element.innerHTML = '.';
@@ -362,10 +402,12 @@ class MotusGame {
                 element.style.transform = 'rotate(90deg)';
                 element.style.textAlign = 'center';
             });
-            this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFill);
+            this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFillOnGrid);
         } else {
             // If the user has reached the last row and the word is not complete, the user loses
             this.isGamePlaying = false;
+            this.clearKeyboard();
+            this.lettersTyped = [];
             this.playButton.innerHTML = 'Jouer';
             this.leaderBoardLink.classList.remove('disabled-link');
             this.playButton.removeAttribute('disabled');
@@ -408,17 +450,7 @@ class MotusGame {
 }
 
 const levelInput = document.querySelector('.level-input-value');
-
-const motusGrid = document.querySelector('.motus-grid');
-
-if (/Mobi|Android/i.test(navigator.userAgent)) {
-    motusGrid.addEventListener('click', function() {
-        this.focus();
-    });
-}
-
 levelInput.value = 6;
-
 let level = 6;
 let motusGame = new MotusGame(level);
 
