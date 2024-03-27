@@ -3,6 +3,7 @@ class MotusGame {
         this.initElements()
         this.initVariables(level);
         this.initEvents();
+        this.initKeyboard();
         this.displayGrid('default');
     }
     
@@ -40,6 +41,19 @@ class MotusGame {
     initEvents() {
         this.playButton.addEventListener('click', () => this.handlePlayButtonClick());
         document.addEventListener('keydown', (e) => this.handleKeyDown(e));
+    }
+
+    initKeyboard() {
+        document.addEventListener('DOMContentLoaded', () => {
+            const keys = document.querySelectorAll('.key');
+
+            keys.forEach(key => {
+                key.addEventListener('click', () => {
+                    const keyValue = key.getAttribute('data-key');
+                    this.handleUserInput({key: keyValue}, this.randomWord);
+                });
+            });
+        });
     }
 
     handlePlayButtonClick() {

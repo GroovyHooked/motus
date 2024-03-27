@@ -5,6 +5,10 @@
 * Browsers: last 10 versions
 */
 
+body {
+    margin-bottom: 80px;
+}
+
 .motus-container {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -41,12 +45,11 @@
 
 .message-container-game {
     position: absolute;
-    top: 20vh;
-    text-align: center;
+    top: 17vh;
 }
 
 .motus-grid {
-    margin: 14vh auto 0;
+    margin: 5vh auto 0;
     width: 280px;
 
 }
