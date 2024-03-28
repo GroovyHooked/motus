@@ -19,7 +19,6 @@ const { SpellChecker } = require('./utils/spell_check.js')
 
 
 const app = express()
-const port = 3000
 
 const sess = {
   secret: process.env.SESSION_SECRET,
