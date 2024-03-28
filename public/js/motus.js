@@ -50,6 +50,7 @@ class MotusGame {
 
             keys.forEach(key => {
                 key.addEventListener('click', () => {
+                    this.vibrate();
                     const keyValue = key.getAttribute('data-key');
                     this.handleUserInput({ key: keyValue }, this.randomWord);
                 });
@@ -114,6 +115,14 @@ class MotusGame {
     handleKeyDown(e) {
         e.preventDefault();
         this.handleUserInput(e, this.randomWord);
+    }
+
+    vibrate() {
+        if ("vibrate" in navigator) {
+            navigator.vibrate(100);
+        } else {
+            console.log("L'API de vibration n'est pas disponible sur ce navigateur.");
+        }
     }
 
     gameInit(level) {
@@ -367,7 +376,7 @@ class MotusGame {
                 randomWordCopy = randomWordCopy.replace(letter, '.');
             }
         });
-      
+
         this.colorKeyboardLetter(this.lettersTyped);
 
         // If every indexes are in the array, the word is complete
