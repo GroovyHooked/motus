@@ -170,6 +170,7 @@ class MotusGame {
         if (!this.isGamePlaying) return;
         if (event.key === "Enter" || event.key === "Backspace" || event.key.match(/^[a-zA-Z]$/i)) {
             if (event.key === "Enter") {
+                this.isGamePlaying = false;
                 this.handleEnterKey(randomWord);
             } else if (event.key === "Backspace") {
                 // If the user presses the backspace key, remove the last letter 
@@ -327,7 +328,10 @@ class MotusGame {
 
     async handleEnterKey(randomWord) {
         // return if the game is not playing
-        if (this.indexOfRowToFill > 6) return;
+        if (this.indexOfRowToFill > 6) {
+            this.isGamePlaying = true;
+            return;
+        }
         // If the user presses the enter key, check if the word is complete
         // and if it is, check if the word is correct
         const rowLetters = [];
@@ -339,6 +343,7 @@ class MotusGame {
         });
         // If the word is not complete, return
         if (rowLetters.length < randomWord?.length) {
+            this.isGamePlaying = true;
             this.displayMessage('Les cases vides ne sont pas autorisées');
             return;
         }
@@ -351,6 +356,7 @@ class MotusGame {
         const word = rowLetters.join('');
         const isWordValid = await this.spellCheck(word);
         if (!isWordValid) {
+            this.isGamePlaying = true;
             this.displayMessage('Le mot est mal orthographié');
             return;
         }
@@ -412,6 +418,7 @@ class MotusGame {
                 element.style.textAlign = 'center';
             });
             this.indexOfLetterTyped = this.returnFirstAvailableIndex(this.wordIndexesToFillOnGrid);
+            this.isGamePlaying = true;
         } else {
             // If the user has reached the last row and the word is not complete, the user loses
             this.isGamePlaying = false;
