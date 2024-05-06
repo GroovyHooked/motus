@@ -466,8 +466,8 @@ class MotusGame {
 }
 
 const levelInput = document.querySelector('.level-input-value');
-levelInput.value = 6;
-let level = 6;
+levelInput.value = 7;
+let level = 7;
 let motusGame = new MotusGame(level);
 
 
