@@ -143,7 +143,7 @@ app.post('/word', async (req, res) => {
 // data endpoint
 app.post('/spell-check', async (req, res) => {
   const { word } = req.body;
-  const spellChecker = new SpellChecker('./utils/dico.txt');
+  const spellChecker = new SpellChecker('./utils/dictionaries/dico.txt');
   if (spellChecker.checkSpelling(word)) {
     res.json({ success: true });
   } else {
